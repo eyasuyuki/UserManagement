@@ -3,7 +3,8 @@
 
     <string name="app_name">UserManagement</string>
     <string name="current_user_label">Current user:</string>
-    <string name="switch_user_button_label">Switch user:</string>
+    <string name="switch_user_button_label">Switch user to </string>
+    <string name="remove_users_button_label">Remove users</string>
     <string name="menu_settings">Settings</string>
 
 </resources>
