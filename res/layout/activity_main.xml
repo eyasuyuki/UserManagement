@@ -31,11 +31,18 @@
 		android:text="@string/switch_user_button_label"
         />
     
+    <!-- add user -->
+    <Button android:id="@+id/add_user_button"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/add_user_button_label"
+        />
+    
     <!-- remove users -->
     <Button android:id="@+id/remove_users_button"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:text="@string/remove_users_button_label"
         />
-
+    
 </LinearLayout>
