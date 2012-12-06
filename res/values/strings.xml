@@ -4,7 +4,9 @@
     <string name="app_name">UserManagement</string>
     <string name="current_user_label">Current user:</string>
     <string name="switch_user_button_label">Switch user to </string>
+    <string name="add_user_button_label">Add user</string>
     <string name="remove_users_button_label">Remove users</string>
+    <string name="user_name_default">Guest</string>
     <string name="menu_settings">Settings</string>
 
 </resources>
