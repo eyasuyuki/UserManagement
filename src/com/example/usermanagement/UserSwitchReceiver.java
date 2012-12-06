@@ -16,15 +16,24 @@ public class UserSwitchReceiver extends BroadcastReceiver {
 	private static final String TAG = UserSwitchReceiver.class.getSimpleName();
 
 	public static final String ACTION_USER_SWITCHED = "android.intent.action.USER_SWITCHED";
-	public static final String EXTRA_USER_HANDLE    ="android.intent.extra.user_handle";
-	
+	public static final String ACTION_USER_ADDED    = "android.intent.action.USER_ADDED";
+	public static final String ACTION_USER_REMOVED  = "android.intent.action.USER_REMOVED";
+	public static final String EXTRA_USER_HANDLE    = "android.intent.extra.user_handle";
+
+	Context context = null;
 	UserInfo currentUser = null;
 	
 	public UserInfo getCurrentUser() { return currentUser; }
+	public void ungerister() {
+		context.unregisterReceiver(this);
+	}
 	
 	public UserSwitchReceiver(Context context) {
+		this.context = context;
 		// register
 		IntentFilter filter = new IntentFilter(ACTION_USER_SWITCHED);
+		filter.addAction(ACTION_USER_ADDED);
+		filter.addAction(ACTION_USER_REMOVED);
 		context.registerReceiver(this, filter);
 		currentUser = getCurrentUser(context);
 	}
