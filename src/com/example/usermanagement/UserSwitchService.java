@@ -47,6 +47,7 @@ public class UserSwitchService extends IntentService {
 					e.printStackTrace();
 				}
 			}
+			listeners.finishBroadcast();
 		}
 	}
 
