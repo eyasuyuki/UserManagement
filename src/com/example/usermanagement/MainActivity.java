@@ -13,6 +13,7 @@ import android.content.Loader;
 import android.content.ServiceConnection;
 import android.content.pm.UserInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.UserManager;
@@ -35,6 +36,9 @@ public class MainActivity extends Activity {
 	Button removeButton = null;
 	int selected = 0;
 	
+	Handler handler = new Handler();
+	UserSwitchReceiver receiver = null;
+			
 	LoaderManager.LoaderCallbacks<List<UserInfo>> usersCallbacks =
 			new LoaderManager.LoaderCallbacks<List<UserInfo>>() {
 
@@ -70,10 +74,17 @@ public class MainActivity extends Activity {
 				}};
 				
 	IUpdateListener updateListener = new IUpdateListener.Stub() {
+		final String TAG = IUpdateListener.class.getSimpleName();
 		
 		@Override
 		public void update() throws RemoteException {
-			init();
+			Log.d(TAG, "update:");
+			handler.post(new Runnable(){
+				@Override
+				public void run() {
+					init();
+				}
+			});
 		}
 	};
 	
@@ -171,6 +182,7 @@ public class MainActivity extends Activity {
         switchButton.setOnClickListener(switchUserListener);
         removeButton.setOnClickListener(removeUsersListener);
 
+    	receiver = new UserSwitchReceiver(this);
         init();
         
         bindService(new Intent(IUserSwitchService.class.getName()),
@@ -179,12 +191,12 @@ public class MainActivity extends Activity {
     }
     
     void init() {
-    	UserSwitchReceiver receiver = new UserSwitchReceiver(this);
     	UserInfo currentUser = receiver.getCurrentUser();
     	if (currentUser != null) {
     		messageText.setText(currentUser.name);
     	}
     	
+    	getLoaderManager().destroyLoader(0);
         getLoaderManager().initLoader(0, null, usersCallbacks);
     }
 
@@ -198,6 +210,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		unbindService(userSwitchConnection);
+		receiver.ungerister();
 
 		super.onDestroy();
 	}
