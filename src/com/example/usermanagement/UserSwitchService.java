@@ -17,13 +17,13 @@ public class UserSwitchService extends IntentService {
 		
 		@Override
 		public void removeListener(IUpdateListener listener) throws RemoteException {
-			Log.d(TAG, "removeListener:");
+			Log.d(TAG, "removeListener: listener="+listener);
 			listeners.unregister(listener);
 		}
 		
 		@Override
 		public void addListener(IUpdateListener listener) throws RemoteException {
-			Log.d(TAG, "addListener:");
+			Log.d(TAG, "addListener: listener="+listener);
 			listeners.register(listener);
 		}
 	};
@@ -37,10 +37,12 @@ public class UserSwitchService extends IntentService {
 		Log.d(TAG, "onHandleIntent");
 		synchronized (listeners) {
 			int count = listeners.beginBroadcast();
+			Log.d(TAG, "onHandleIntent: count="+count);
 			for (int i=0; i<count; i++) {
-				IUpdateListener item = listeners.getBroadcastItem(i);
+				IUpdateListener listener = listeners.getBroadcastItem(i);
+				Log.d(TAG, "onHandleIntent: listener="+listener);
 				try {
-					item.update();
+					listener.update();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
