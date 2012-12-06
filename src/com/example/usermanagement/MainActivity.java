@@ -33,6 +33,7 @@ public class MainActivity extends Activity {
 	TextView messageText = null;
 	Spinner userSpinner = null;
 	Button switchButton = null;
+	Button addButton = null;
 	Button removeButton = null;
 	int selected = 0;
 	
@@ -149,6 +150,23 @@ public class MainActivity extends Activity {
  		}
 	};
 	
+	View.OnClickListener addUserListener = new View.OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			try {
+				UserManager um = (UserManager)MainActivity.this.getSystemService(Context.USER_SERVICE);
+				Method getUsers = um.getClass().getMethod("getUsers", null);
+				Method createUser = um.getClass().getMethod("createUser", new Class[]{String.class, int.class});
+				List<UserInfo> users = (List<UserInfo>)getUsers.invoke(um, null);
+				String name = MainActivity.this.getString(R.string.user_name_default) +  "" + users.size();
+				createUser.invoke(um, new Object[]{name, UserInfo.FLAG_GUEST});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	};
+	
 	View.OnClickListener removeUsersListener = new View.OnClickListener() {
 		
 		@Override
@@ -175,11 +193,13 @@ public class MainActivity extends Activity {
         messageText = (TextView)findViewById(R.id.message_text);
         userSpinner = (Spinner)findViewById(R.id.user_spinner);
         switchButton = (Button)findViewById(R.id.switch_user_button);
+        addButton = (Button)findViewById(R.id.add_user_button);
         removeButton = (Button)findViewById(R.id.remove_users_button);
         
         userSpinner.setOnItemSelectedListener(selectedListener);
         
         switchButton.setOnClickListener(switchUserListener);
+        addButton.setOnClickListener(addUserListener);
         removeButton.setOnClickListener(removeUsersListener);
 
     	receiver = new UserSwitchReceiver(this);
