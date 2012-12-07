@@ -13,6 +13,8 @@ public class UserLoader extends AsyncTaskLoader<List<UserInfo>> {
 	private static final String TAG = UserLoader.class.getSimpleName();
 	
 	Context context = null;
+	
+	UserInfo currentUser = null;
 
 	public UserLoader(Context context) {
 		super(context);
