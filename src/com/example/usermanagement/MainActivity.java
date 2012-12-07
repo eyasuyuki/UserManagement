@@ -1,5 +1,6 @@
 package com.example.usermanagement;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 	private static final String TAG = MainActivity.class.getSimpleName();
 
+	UserInfo currentUser = null;
 	List<UserInfo> users = null;
 	TextView messageText = null;
 	Spinner userSpinner = null;
@@ -65,6 +67,17 @@ public class MainActivity extends Activity {
 										android.R.layout.simple_list_item_1,
 										names);
 						userSpinner.setAdapter(adapter);
+
+						if (currentUser != null) {
+							for (int i=0; i<users.size(); i++) {
+								UserInfo u = users.get(i);
+								if (u == null) continue;
+								if (currentUser.name.equals(u.name)) {
+									userSpinner.setSelection(i);
+									break;
+								}
+							}
+						}
 					} 
 				}
 
@@ -132,18 +145,22 @@ public class MainActivity extends Activity {
 		String label = MainActivity.this.getString(R.string.switch_user_button_label) + " "+ name;
 		switchButton.setText(label);
 	}
+	
+	void switchUser(int id) throws IllegalArgumentException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+		Object activityManagerNative = UserSwitchReceiver.getActivityManagerNative();
+		Method switchUser = null;
+		Method[] methods = activityManagerNative.getClass().getDeclaredMethods();
+		for (Method m: methods) if (m.getName().equals("switchUser")) switchUser = m;
+		Log.d(TAG, "onClick: switchUser="+switchUser+", selected="+selected);
+		switchUser.invoke(activityManagerNative, new Object[]{id});
+	}
 		
 	View.OnClickListener switchUserListener = new View.OnClickListener() {
 		
 		@Override
 		public void onClick(View v) {
-        	try {
-				Object activityManagerNative = UserSwitchReceiver.getActivityManagerNative();
-				Method switchUser = null;
-				Method[] methods = activityManagerNative.getClass().getDeclaredMethods();
-				for (Method m: methods) if (m.getName().equals("switchUser")) switchUser = m;
-				Log.d(TAG, "onClick: switchUser="+switchUser+", selected="+selected);
-				switchUser.invoke(activityManagerNative, new Object[]{users.get(selected).id});
+			try {
+				switchUser(users.get(selected).id);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -179,6 +196,8 @@ public class MainActivity extends Activity {
 				for (int i=1; i<users.size(); i++) {
 					removeUser.invoke(um, new Object[]{users.get(i).id});
 				}
+				// switch to default user
+				switchUser(users.get(0).id);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -211,7 +230,7 @@ public class MainActivity extends Activity {
     }
     
     void init() {
-    	UserInfo currentUser = receiver.getCurrentUser();
+    	currentUser = receiver.getCurrentUser();
     	if (currentUser != null) {
     		messageText.setText(currentUser.name);
     	}
